@@ -1,7 +1,13 @@
 {
+  "name": "tvk-register",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
     "cookie-parser": "^1.4.7",
-    "express": "^5.2.1",
+    "express": "^5.1.0",
     "firebase-admin": "^14.2.0"
   }
 }
