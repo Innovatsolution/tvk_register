@@ -1,28 +1,30 @@
+require("dotenv").config(); // does nothing on Render if no .env file exists — harmless
+
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const crypto = require("crypto");
-
 const { initializeApp, cert } = require("firebase-admin/app");
-const { getFirestore , Timestamp} = require("firebase-admin/firestore");
+const { getFirestore, Timestamp } = require("firebase-admin/firestore");
 
-const serviceAccount = require("./independent-innovators-firebase.json");
+const serviceAccount = {
+  type: "service_account",
+  project_id: process.env.FIREBASE_PROJECT_ID,
+  private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  client_email: process.env.FIREBASE_CLIENT_EMAIL,
+};
 
 const app = express();
-
 app.use(express.json());
 app.use(cookieParser());
-
 app.use(express.static("public"));
-
 app.set("trust proxy", true);
 
-// Firebase initialization
 const firebaseApp = initializeApp({
   credential: cert(serviceAccount),
 });
-
-// Firestore
 const db = getFirestore(firebaseApp);
+
+// ... rest of your /register route stays exactly the same
 
 /*
 |--------------------------------------------------------------------------
