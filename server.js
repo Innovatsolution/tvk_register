@@ -38,11 +38,10 @@ const COLLECTION = "tvk_alwarkurichi_register";
 // together under that label.
 // ---------------------------------------------------------
 const QR_GROUPS = {
-  "qrcode 1": ["3", "10", "15"],
-  "qrcode 2": ["11", "12", "02"],
-  "qrcode 3": ["12", "14", "01"],
+  "qrcode 1": ["031015"],
+  "qrcode 2": ["111202"],
+  "qrcode 3": ["131401"],
 };
-
 // Simple admin password check (set ADMIN_PASSWORD in env)
 function checkAdminAuth(req, res) {
   const pass = req.query.key || req.headers["x-admin-key"];
@@ -231,26 +230,27 @@ app.get("/register", async (req, res) => {
 app.get("/admin/registrations", async (req, res) => {
   try {
     // if (!checkAdminAuth(req, res)) return;
-
+ 
     const snapshot = await db.collection(COLLECTION).get();
-
+ 
     const overallCount = snapshot.size;
-
+ 
     // init counts for each group at 0
     const groupCounts = {};
     Object.keys(QR_GROUPS).forEach((label) => (groupCounts[label] = 0));
-
+ 
     snapshot.forEach((doc) => {
       const data = doc.data();
-      const qrType = (data.qr_type || "").toString().trim();
-
+      const qrType = (data.qr_type || "").toString().trim().toLowerCase();
+ 
       Object.entries(QR_GROUPS).forEach(([label, values]) => {
-        if (["31015","111202","131401"].includes(qrType)) {
+        const normalizedValues = values.map((v) => v.toLowerCase());
+        if (normalizedValues.includes(qrType)) {
           groupCounts[label]++;
         }
       });
     });
-
+ 
     const groupCardsHtml = Object.entries(groupCounts)
       .map(
         ([label, count], idx) => `
@@ -261,14 +261,14 @@ app.get("/admin/registrations", async (req, res) => {
         `
       )
       .join("");
-
+ 
     return res.status(200).send(`
       <!DOCTYPE html>
       <html lang="ta">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ஆழ்வார்குறிச்சி பேரூர் வருகை பதிவேடு</title>
+        <title>ஆழ்வார்குறிச்சி பெரூர் வருகை பதிவேடு</title>
         <style>
           * { box-sizing: border-box; }
           body {
@@ -310,18 +310,18 @@ app.get("/admin/registrations", async (req, res) => {
       </head>
       <body>
         <div class="panel">
-          <h1>ஆழ்வார்குறிச்சி பேரூர் வருகை பதிவேடு</h1>
+          <h1>ஆழ்வார்குறிச்சி பெரூர் வருகை பதிவேடு</h1>
           <div class="subtitle">Alwarkurichi Perur Varukai Pathivedu — Admin Summary</div>
-
+ 
           <div class="overall">
             <div class="label">மொத்த பதிவுகள் (Total Registrations)</div>
             <div class="count">${overallCount}</div>
           </div>
-
+ 
           <div class="stats-grid">
             ${groupCardsHtml}
           </div>
-
+ 
           <a class="refresh" href="?key=${req.query.key || ""}">🔄 Refresh</a>
         </div>
       </body>
