@@ -245,7 +245,7 @@ app.get("/admin/registrations", async (req, res) => {
       const qrType = (data.qr_type || "").toString().trim();
 
       Object.entries(QR_GROUPS).forEach(([label, values]) => {
-        if (values.includes(qrType)) {
+        if (["31015","111202","131401"].includes(qrType)) {
           groupCounts[label]++;
         }
       });
